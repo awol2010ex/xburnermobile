@@ -11,7 +11,7 @@
  
     <script type="text/javascript"  charset="utf-8" src="js/sencha-touch-debug.js"></script>
     <script type="text/javascript"  charset="utf-8" src="js/touch-charts-debug.js"></script>
-    
+    <script type="text/javascript"  charset="utf-8" src="js/db.js"></script>
     <script type="text/javascript" >
     
     
@@ -21,8 +21,10 @@
     Ext.setup({
         glossOnIcon: false,
         onReady: function() {
-        	
+        	initdb();//初始化数据库
 
+        	
+        	
             
             var server_page_field= new Ext.Panel({html:"<font color='white'>第1页</font>"});//显示服务端当前页数
      
@@ -68,6 +70,9 @@
                          	        	
                          	        	text:'保存',
                          	        	handler:function(){
+                         	        		
+                         	        		//保存服务地址设置
+                         	        		updateSetting("baseURL",Ext.getCmp("baseURL").getValue());
                          	        	}
                          	          }
                          	        
