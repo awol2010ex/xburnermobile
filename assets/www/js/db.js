@@ -25,9 +25,30 @@ function initdb(){
 	    	  
 	    	  getSetting("baseURL",function(tx ,results){
 	    		  
-	    		  if(!results || !results.rows ||results.rows.length==0){}
+	    		  if(!results || !results.rows ||results.rows.length==0){
+	    			  
+	    			  initView();//初始化页面
+	    		  }
 	    		  else{
-	    			  Ext.getCmp("baseURL").setValue(results.rows.item(0).value);//设置服务地址
+	    			  
+	    			  var _baseURL=results.rows.item(0).value;
+	    			  
+	    			//服务端列表展现模板
+	    			  itemTplServer= '<div class="contact"  style="padding:10px">'+
+	    			                                          '<img src="icon/download.jpg" height="36" width="36"   onclick="downloadChart(\'{id}\')"/>&nbsp;&nbsp;'+ //下载按钮
+	    			                                          '<a  target="_blank" href="'+
+	    			                                          _baseURL
+	    			                                          +'/restful/report/chart/open/?reportid={id}"><img src="icon/charticon/{define.charttype}/icon-ipad.png"  height="36" width="36"/></a>'+   //打开报表按钮
+	    			                                          '&nbsp;&nbsp;<strong>{foldername}</strong> /<strong>{queryname}</strong>&nbsp;&nbsp;&nbsp;'+
+	    			                                          '<div id="loadingimg_{id}"></div>'+
+	    			                                          '</div>';
+	    			  initView();//初始化页面
+	    			  
+	    			  Ext.getCmp("baseURL").setValue(_baseURL);//设置服务地址
+	    			  
+	    			  
+	    			//刷新服务端列表
+	    			  refreshServerList();
 	    		  }
 	    		  
 	    	  })

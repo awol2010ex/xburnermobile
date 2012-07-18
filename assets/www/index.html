@@ -13,9 +13,31 @@
     <script type="text/javascript"  charset="utf-8" src="js/touch-charts-debug.js"></script>
     <script type="text/javascript"  charset="utf-8" src="js/db.js"></script>
     <script type="text/javascript" >
+    var server_page=1;//当前页
     
+    var server_pagesize =5 ;//每页行数
+    
+    var server_total=0;//总数
+    
+    var server_total_page=0;//总页数
     
     var server_total_page_field=null;//显示总页数
+    
+	//服务端列表展现模板
+	var itemTplServer=null;
+    //客户端列表展现模板                                 
+    var itemTplClient= '<div class="contact"  style="padding:10px">'+
+                                          '<img src="icon/delete.png" height="36" width="36"   onclick="removeChart(\'{id}\')"/>&nbsp;&nbsp;'+ //删除按钮
+                                           '<a  target="_blank" href="chart/{define.charttype}.html?reportid={id}" ><img src="icon/charticon/{define.charttype}/icon-ipad.png"  height="36" width="36"/></a>'+   //打开报表按钮
+                                          '&nbsp;&nbsp;<strong>{foldername}</strong> /<strong>{queryname}</strong>&nbsp;&nbsp;&nbsp;'+
+                                          '<div id="loadingimg_{id}"></div>'+
+                                          '</div>';
+    
+    //服务端数据源
+    var serverStore=null;
+    
+    //客户端数据源
+    var clientStore=null;
     
     //设置页面
     Ext.setup({
@@ -23,107 +45,165 @@
         onReady: function() {
         	initdb();//初始化数据库
 
-        	
-        	
-            
-            var server_page_field= new Ext.Panel({html:"<font color='white'>第1页</font>"});//显示服务端当前页数
-     
-            server_total_page_field= new Ext.Panel({html:"<font color='white'>共1页</font>"});//显示服务端总页数
-        	
-        	
-        	 new Ext.TabPanel({
-                 tabBar: {
-                    dock: 'bottom',
-                    layout: {
-                        pack: 'center'//居中
-                    }
-                 },
-                 fullscreen: true,//全屏
-                 cardSwitchAnimation: {
-                       type: 'slide'//滑动
-                 },
-                 ui: 'light',
-                 items:[
-                 
-                     {
-                         title:"设置",
-                         iconCls: 'info',
-                         items: [
-                     	        {
-                     	            xtype: 'fieldset',
-                     	            title: '设置',
-                     	            items: [
-                     	                {
-                     	                    xtype: 'textfield',
-                     	                    label: '服务地址',
-                     	                    id:"baseURL",
-                     	                    name: 'baseURL'
-                     	                }
-                     	            ]
-                     	        },
-                         	    {
-                                     xtype: 'toolbar',
-                                     docked: 'bottom',
-                                     items: [
-                         	    
-                         	         {
-                         	        	
-                         	        	text:'保存',
-                         	        	handler:function(){
-                         	        		
-                         	        		//保存服务地址设置
-                         	        		updateSetting("baseURL",Ext.getCmp("baseURL").getValue());
-                         	        	}
-                         	          }
-                         	        
-                         	        ]
-                         	    }
-                     	]
-                     },
-                     {
-                         title:"服务器",
-                         iconCls: 'info',
-                         items:[
-                                
-                                {
-                                  xtype: 'toolbar',
-                                  docked: 'top',
-                                  ui:"light",
-
-                                  items: [
-                                     server_total_page_field,
-                                     {
-                                          text:"&nbsp;"
-                                     },
-                                     server_page_field,
-                                     {
-                                          text: "下一页", 
-                                          handler:function(){
-                                             
-                                          }
-                                     },
-                                     {
-                                          text: "上一页", 
-                                          handler:function(){ 
-                                             
-                                          }
-                                     },
-                                     
-                                     { xtype: 'spacer' }
-                                  ]
-                                }
-                                
-                            ]
-                     },
-                     {
-                         
-                         title:"已下载",
-                         iconCls: 'download'
-                     }
-                 ]
-        	 });   
         }
     });
+    
+    function initView(){
+
+    	
+  	  //服务端数据源
+      serverStore= new Ext.data.JsonStore({
+          fields: ["id","queryname","define","foldername"]
+      
+      });
+      
+      
+        //客户端数据源
+      clientStore= new Ext.data.JsonStore({
+          fields: ["id","queryname","define","foldername"]
+      
+      });
+      
+      var server_page_field= new Ext.Panel({html:"<font color='white'>第1页</font>"});//显示服务端当前页数
+
+      server_total_page_field= new Ext.Panel({html:"<font color='white'>共1页</font>"});//显示服务端总页数
+  	
+  	
+  	  new Ext.TabPanel({
+           tabBar: {
+              dock: 'bottom',
+              layout: {
+                  pack: 'center'//居中
+              }
+           },
+           fullscreen: true,//全屏
+           cardSwitchAnimation: {
+                 type: 'slide'//滑动
+           },
+           ui: 'light',
+           items:[
+           
+               {
+                   title:"设置",
+                   iconCls: 'info',
+                   items: [
+               	        {
+               	            xtype: 'fieldset',
+               	            title: '设置',
+               	            items: [
+               	                {
+               	                    xtype: 'textfield',
+               	                    label: '服务地址',
+               	                    id:"baseURL",
+               	                    name: 'baseURL'
+               	                }
+               	            ]
+               	        },
+                   	    {
+                               xtype: 'toolbar',
+                               docked: 'bottom',
+                               items: [
+                   	    
+                   	         {
+                   	        	
+                   	        	text:'保存',
+                   	        	handler:function(){
+                   	        		
+                   	        		//保存服务地址设置
+                   	        		updateSetting("baseURL",Ext.getCmp("baseURL").getValue());
+                   	        	}
+                   	          }
+                   	        
+                   	        ]
+                   	    }
+               	]
+               },
+               {
+                   title:"服务器",
+                   iconCls: 'info',
+                   items:[
+                          
+                          {
+                            xtype: 'toolbar',
+                            docked: 'top',
+                            ui:"light",
+
+                            items: [
+                               server_total_page_field,
+                               {
+                                    text:"&nbsp;"
+                               },
+                               server_page_field,
+                               {
+                                    text: "下一页", 
+                                    handler:function(){
+                                       
+                                    }
+                               },
+                               {
+                                    text: "上一页", 
+                                    handler:function(){ 
+                                       
+                                    }
+                               },
+                               
+                               { xtype: 'spacer' }
+                            ]
+                          },
+                          {
+                              
+                              //give it an xtype of list
+                              xtype: 'list',
+
+                              ui: 'round',
+                              height:"100%",
+
+                              //itemTpl defines the template for each item in the list
+                              itemTpl: itemTplServer,
+
+                              //give it a link to the store instance
+                              store: serverStore,
+                              emptyText: '<div style="margin-top: 20px; text-align: center">没有报表</div>',
+                              disableSelection: true
+                           
+                           }
+                          
+                      ]
+               },
+               {
+                   
+                   title:"已下载",
+                   iconCls: 'download'
+               }
+           ]
+  	 });   
+    }
+    
+    
+    
+    
+    //刷新服务端列表
+    function refreshServerList(){
+        //导入服务端数据
+               Ext.Ajax.request({
+      	        	    url: Ext.getCmp("baseURL").getValue()+'/restful/report/list/',
+      	        	    params:{
+      	        	        page:server_page,
+      	        	        pagesize:server_pagesize
+      	        	    },
+      	        	    success: function(response){
+      	        	        var result =Ext.decode( response.responseText);
+      	        	        var rows=result.Rows;
+      	        	        server_total=result.Total;
+      	        	        
+      	        	        server_total_page = parseInt((server_total % server_pagesize ==0 )? (server_total /server_pagesize):(server_total / server_pagesize+1));
+      	        	        if(server_total_page_field && server_total_page_field.el)
+      	        	        server_total_page_field.el.dom.firstChild.innerHTML=("<font color='white'>共"+server_total_page+"页</font>");//显示总页数
+      	        	        serverStore.loadData(rows);
+      	        	    }
+      	       }); 
+    
+    }
      
     </script>
   </head>
