@@ -13,10 +13,20 @@
     <script type="text/javascript"  charset="utf-8" src="js/touch-charts-debug.js"></script>
     
     <script type="text/javascript" >
+    
+    
+    var server_total_page_field=null;//显示总页数
+    
     //设置页面
     Ext.setup({
         glossOnIcon: false,
         onReady: function() {
+        	
+
+            
+            var server_page_field= new Ext.Panel({html:"<font color='white'>第1页</font>"});//显示服务端当前页数
+     
+            server_total_page_field= new Ext.Panel({html:"<font color='white'>共1页</font>"});//显示服务端总页数
         	
         	
         	 new Ext.TabPanel({
@@ -35,11 +45,70 @@
                  
                      {
                          title:"设置",
-                         iconCls: 'info'
+                         iconCls: 'info',
+                         items: [
+                     	        {
+                     	            xtype: 'fieldset',
+                     	            title: '设置',
+                     	            items: [
+                     	                {
+                     	                    xtype: 'textfield',
+                     	                    label: '服务地址',
+                     	                    id:"baseURL",
+                     	                    name: 'baseURL'
+                     	                }
+                     	            ]
+                     	        },
+                         	    {
+                                     xtype: 'toolbar',
+                                     docked: 'bottom',
+                                     items: [
+                         	    
+                         	         {
+                         	        	
+                         	        	text:'保存',
+                         	        	handler:function(){
+                         	        	}
+                         	          }
+                         	        
+                         	        ]
+                         	    }
+                     	]
                      },
                      {
                          title:"服务器",
-                         iconCls: 'info'
+                         iconCls: 'info',
+                         items:[
+                                
+                                {
+                                  xtype: 'toolbar',
+                                  docked: 'top',
+                                  ui:"light",
+
+                                  items: [
+                                     server_total_page_field,
+                                     {
+                                          text:"&nbsp;"
+                                     },
+                                     server_page_field,
+                                     {
+                                          text: "下一页", 
+                                          handler:function(){
+                                             
+                                          }
+                                     },
+                                     {
+                                          text: "上一页", 
+                                          handler:function(){ 
+                                             
+                                          }
+                                     },
+                                     
+                                     { xtype: 'spacer' }
+                                  ]
+                                }
+                                
+                            ]
                      },
                      {
                          
