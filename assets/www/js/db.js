@@ -12,17 +12,21 @@ function initdb(){
 	 db.transaction(
 			 
 	      function(tx){
-	    	  tx.executeSql('CREATE TABLE IF NOT EXISTS T_SETTING (id  unique,  value )');
+	    	  tx.executeSql('CREATE TABLE IF NOT EXISTS T_SETTING (id  unique,  value )');//生成设置表
+	    	  
+	    	  tx.executeSql('CREATE TABLE IF NOT EXISTS T_BIZ_QUERY (id  unique,  queryname  ,define ,foldername )');//生成报表信息表
 	      },
 	      //失败
 	      function(err){
-	    	  alert("初始化数据库失败:"+err.code);
+	    	  //alert("初始化数据库失败:"+err.code);
+	    	  
+	    	  Ext.Msg.alert('错误', "初始化数据库失败:"+err.code, Ext.emptyFn);
 	      },
 	      //成功
 	      function(tx, results){
 	    	  
 	    	  
-	    	  
+	    	  //取得服务端地址
 	    	  getSetting("baseURL",function(tx ,results){
 	    		  
 	    		  if(!results || !results.rows ||results.rows.length==0){
@@ -31,7 +35,7 @@ function initdb(){
 	    		  }
 	    		  else{
 	    			  
-	    			  var _baseURL=results.rows.item(0).value;
+	    			  var _baseURL=results.rows.item(0).value;//服务端地址
 	    			  
 	    			//服务端列表展现模板
 	    			  itemTplServer= '<div class="contact"  style="padding:10px">'+
@@ -68,8 +72,8 @@ function updateSetting(_id ,_value){
 		 db.transaction(
 				 
 		      function(tx){
-		    	  tx.executeSql("select * from  T_SETTING where id='"+_id+"' "  ,
-		    		  [] ,
+		    	  tx.executeSql("select * from  T_SETTING where id=?"  ,
+		    		  [_id] ,
 				      //成功
 				      function(tx, results){
 				    	  
@@ -82,11 +86,15 @@ function updateSetting(_id ,_value){
 				    		     },
 				   		          //失败
 				   		         function(err){
-				   		    	     alert("插入设置表失败:"+err.code);
+				   		    	     //alert("插入设置表失败:"+err.code);
+				   		    	     
+				   		    	     Ext.Msg.alert('错误', "插入设置表失败:"+err.code, Ext.emptyFn);
 				   		         },
 				   		          //成功
 				   		         function(tx, results){
-				   		    	     alert("插入设置表成功");
+				   		    	     //alert("插入设置表成功");
+				   		    	     
+				   		    	     Ext.Msg.alert('提示',"插入设置表成功", Ext.emptyFn);
 				   		         }
 				    		     
 				    		  
@@ -101,11 +109,13 @@ function updateSetting(_id ,_value){
 						    		     },
 						   		          //失败
 						   		         function(err){
-						   		    	     alert("更新设置表失败:"+err.code);
+						   		    	     //alert("更新设置表失败:"+err.code);
+						   		    	     Ext.Msg.alert('错误',"更新设置表失败:"+err.code, Ext.emptyFn);
 						   		         },
 						   		          //成功
 						   		         function(tx, results){
-						   		    	     alert("更新设置表成功");
+						   		    	     //alert("更新设置表成功");
+						   		    	     Ext.Msg.alert('提示',"更新设置表成功", Ext.emptyFn);
 						   		         }
 						    		     
 						    		  
@@ -115,7 +125,8 @@ function updateSetting(_id ,_value){
 				      },
 				      //失败
 				      function(err){
-				    	  alert("查询设置表失败:"+err.code);
+				    	  //alert("查询设置表失败:"+err.code);
+				    	  Ext.Msg.alert('错误',"查询设置表失败:"+err.code, Ext.emptyFn);
 				      }
 		    			        
 		    			        
@@ -136,15 +147,101 @@ function getSetting(_id , callback){
 	 db.transaction(
 			 
 		      function(tx){
-		    	  tx.executeSql("select * from  T_SETTING where id='"+_id+"' "  ,
-		    		  [] ,
+		    	  tx.executeSql("select * from  T_SETTING where id=? "  ,
+		    		  [_id] ,
 				      callback,
 				      //失败
 				      function(err){
-				    	  alert("查询设置表失败:"+err.code);
+				    	  //alert("查询设置表失败:"+err.code);
+				    	  
+				    	  Ext.Msg.alert('错误',"查询设置表失败:"+err.code, Ext.emptyFn);
 				      }
 		    	  );
 		      }
 	);	      
 	
 }
+
+//保存报表
+function saveQuery(_id , _queryname , _define ,_foldername){
+	
+	try{	
+		 
+		 //保存报表信息表
+		 db.transaction(
+				 
+		      function(tx){
+		    	  tx.executeSql("select * from  T_BIZ_QUERY where id=?"  ,
+		    		  [_id] ,
+				      //成功
+				      function(tx, results){
+				    	  //没有就插入
+				    	  if(!results || !results.rows ||results.rows.length==0){
+				    		  
+				    		  db.transaction(
+				    		     function(tx){
+				    		    	 
+				    		    	 tx.executeSql("insert into T_BIZ_QUERY values(?,?,?,?)  ",[_id , _queryname , _define ,_foldername]);
+				    		     },
+				   		          //失败
+				   		         function(err){
+				   		    	     //alert("插入报表信息表失败:"+err.code);
+				   		    	     Ext.Msg.alert('错误',"插入报表信息表失败:"+err.code, Ext.emptyFn);
+				   		    	     
+				   		         },
+				   		          //成功
+				   		         function(tx, results){
+				   		    	     //alert("插入报表信息表成功");
+				   		    	     
+				   		    	     Ext.Msg.alert('提示',"插入报表信息表成功", Ext.emptyFn);
+				   		         }
+				    		     
+				    		  
+				    		  );
+				    	  }
+				    	  else{
+				    		  //有就更新
+				    		  db.transaction(
+						    		     function(tx){
+						    		    	 
+						    		    	 tx.executeSql("update T_BIZ_QUERY set queryname=?, define=?, foldername=?   where  id=? ",[_queryname , _define ,_foldername,_id ]);
+						    		     },
+						   		          //失败
+						   		         function(err){
+						   		    	     //alert("更新报表信息表失败:"+err.code);
+						   		    	     
+						   		    	     Ext.Msg.alert('错误',"更新报表信息表失败:"+err.code, Ext.emptyFn);
+						   		         },
+						   		          //成功
+						   		         function(tx, results){
+						   		    	     //alert("更新报表信息表成功");
+						   		    	     
+						   		    	     Ext.Msg.alert('提示',"更新报表信息表成功", Ext.emptyFn);
+						   		         }
+						    		     
+						    		  
+						      );
+				    	  }
+				    	  
+				      },
+				      //失败
+				      function(err){
+				    	  //alert("查询报表信息表失败:"+err.code);
+				    	  
+				    	  Ext.Msg.alert('错误',"查询报表信息表失败:"+err.code, Ext.emptyFn);
+				      }
+		    			        
+		    			        
+		    	  
+		    	  
+		    	  );
+		      }
+		 );
+	  }catch(e){
+		 console.log(e); 
+	  }
+}
+
+
+
+

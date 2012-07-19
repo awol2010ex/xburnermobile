@@ -218,6 +218,46 @@
     
     }
      
+    //下载报表到客户端
+    function downloadChart(_id){
+    	document.getElementById("loadingimg_"+_id).innerHTML="<img src='icon/loading.gif'  width=36  height=36/>";
+    	
+    	
+    	//下载服务端数据
+        Ext.Ajax.request({
+	        	    url: Ext.getCmp("baseURL").getValue()+'/restful/report/chart/download/',
+	        	    params:{
+	        	        reportid:_id
+	        	    },
+	        	    success: function(response){
+	        	      if(response.responseText && response.responseText!=''){
+	        	        var result =Ext.decode( response.responseText);
+	        	        
+	        	        
+	        	        if(result.define.data){
+	        	        	Ext.Msg.alert('提示', '下载成功', Ext.emptyFn);
+	        	        	//有数据时保存报表信息
+	        	            saveQuery(_id , result.queryname , Ext.encode(result.define),  result.foldername);
+	        	            
+	        	        }
+	        	        else{
+	        	            Ext.Msg.alert('提示', '下载失败,没有数据', Ext.emptyFn);
+	        	        
+	        	        }
+	        	        
+	        	        
+	        	        
+	        	        
+	        	      }else{
+	        	      
+	        	        Ext.Msg.alert('提示', '下载失败', Ext.emptyFn);
+	        	      }
+	        	      
+	        	      document.getElementById("loadingimg_"+_id).innerHTML="";
+	        	    }
+	       }); 
+    	
+    }
     </script>
   </head>
   <body>
