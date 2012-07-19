@@ -4,7 +4,6 @@
     <meta name="viewport" content="width=320; user-scalable=no" />
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
     <title>仪表盘</title>
-     <link rel="stylesheet" href="master.css" type="text/css" media="screen" title="no title">
     <script type="text/javascript" charset="utf-8" src="cordova-1.9.0.js"></script>
     <link rel="stylesheet" href="resources/css/touch-charts-demo.css" type="text/css">
     <link rel="stylesheet" href="resources/css/sencha-touch.css" type="text/css">
@@ -82,6 +81,73 @@
            ui: 'light',
            items:[
            
+               
+               {
+                   title:"服务器",
+                   iconCls: 'info',
+                   items:[
+                          
+                          {
+                            xtype: 'toolbar',
+                            docked: 'top',
+                            ui:"light",
+
+                            items: [
+                               server_total_page_field,
+                               {
+                                    text:"&nbsp;"
+                               },
+                               server_page_field,
+                               {
+                                    text: "下一页", 
+                                    handler:function(){
+                                    	//下一页
+                                    	if(server_page<server_total_page)server_page=server_page+1; 
+                                        server_page_field.el.dom.firstChild.innerHTML=("<font color='white'>第"+server_page+"页</font>");
+                                        //刷新服务端列表
+                                        refreshServerList(); 
+                                    }
+                               },
+                               {
+                                    text: "上一页", 
+                                    handler:function(){ 
+                                    	//上一页
+                                    	if(server_page>1)server_page=server_page-1;
+                                        server_page_field.el.dom.firstChild.innerHTML=("<font color='white'>第"+server_page+"页</font>");
+                                        //刷新服务端列表
+                                        refreshServerList(); 
+                                       
+                                    }
+                               },
+                               
+                               { xtype: 'spacer' }
+                            ]
+                          },
+                          {
+                              
+                              //give it an xtype of list
+                              xtype: 'list',
+
+                              ui: 'round',
+                              height:"100%",
+
+                              //itemTpl defines the template for each item in the list
+                              itemTpl: itemTplServer,
+
+                              //give it a link to the store instance
+                              store: serverStore,
+                              emptyText: '<div style="margin-top: 20px; text-align: center">没有报表</div>',
+                              disableSelection: true
+                           
+                           }
+                          
+                      ]
+               },
+               {
+                   
+                   title:"已下载",
+                   iconCls: 'download'
+               },
                {
                    title:"设置",
                    iconCls: 'info',
@@ -116,63 +182,6 @@
                    	        ]
                    	    }
                	]
-               },
-               {
-                   title:"服务器",
-                   iconCls: 'info',
-                   items:[
-                          
-                          {
-                            xtype: 'toolbar',
-                            docked: 'top',
-                            ui:"light",
-
-                            items: [
-                               server_total_page_field,
-                               {
-                                    text:"&nbsp;"
-                               },
-                               server_page_field,
-                               {
-                                    text: "下一页", 
-                                    handler:function(){
-                                       
-                                    }
-                               },
-                               {
-                                    text: "上一页", 
-                                    handler:function(){ 
-                                       
-                                    }
-                               },
-                               
-                               { xtype: 'spacer' }
-                            ]
-                          },
-                          {
-                              
-                              //give it an xtype of list
-                              xtype: 'list',
-
-                              ui: 'round',
-                              height:"100%",
-
-                              //itemTpl defines the template for each item in the list
-                              itemTpl: itemTplServer,
-
-                              //give it a link to the store instance
-                              store: serverStore,
-                              emptyText: '<div style="margin-top: 20px; text-align: center">没有报表</div>',
-                              disableSelection: true
-                           
-                           }
-                          
-                      ]
-               },
-               {
-                   
-                   title:"已下载",
-                   iconCls: 'download'
                }
            ]
   	 });   
@@ -187,17 +196,22 @@
                Ext.Ajax.request({
       	        	    url: Ext.getCmp("baseURL").getValue()+'/restful/report/list/',
       	        	    params:{
-      	        	        page:server_page,
-      	        	        pagesize:server_pagesize
+      	        	        page:server_page,//当前页数
+      	        	        pagesize:server_pagesize//每页行数
       	        	    },
       	        	    success: function(response){
       	        	        var result =Ext.decode( response.responseText);
-      	        	        var rows=result.Rows;
-      	        	        server_total=result.Total;
+      	        	        var rows=result.Rows;//当前页返回数据
+      	        	        server_total=result.Total;//总数
       	        	        
+      	        	        //总页数
       	        	        server_total_page = parseInt((server_total % server_pagesize ==0 )? (server_total /server_pagesize):(server_total / server_pagesize+1));
+      	        	        
+      	        	        //现实总页数
       	        	        if(server_total_page_field && server_total_page_field.el)
       	        	        server_total_page_field.el.dom.firstChild.innerHTML=("<font color='white'>共"+server_total_page+"页</font>");//显示总页数
+      	        	        
+      	        	        //加载本页数据
       	        	        serverStore.loadData(rows);
       	        	    }
       	       }); 
