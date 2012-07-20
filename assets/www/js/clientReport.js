@@ -36,6 +36,9 @@
     }
     
     
+    
+    
+    
     function formatData(rows,x,y)//饼图修整数据
 	{
 		
@@ -81,36 +84,46 @@
     
     var storeDataMap={};//饼图数据Map
     var reportObject=null;//报表内容
-    
+    var db=null;//数据库对象
     Ext.setup({
         glossOnIcon: false,
         onReady: function() {
-        	
+        	db = window.openDatabase("xburnerdb", "1.0", "xburnerdb", 200000);//初始化数据库
         	var  reportid=(GetArgsFromHref(window.location.href ,"reportid"));//报表ID
+        	//取得报表
+        	getClientReportById(reportid ,function(tx,results){
+        		
+        		var item=results.rows.item(0);//查询得到报表数据
+        		
+        		reportObject={id : item.id  ,queryname :item.queryname , define:Ext.decode(item.define)};
+        		
+        		
+        		//字段模型
+        		var cols=reportObject.define.cols;
+            	
+            	for(var i=0,s=cols.length;i<s;i++){
+            		fields.push(cols[i].label);//字段
+            		if(cols[i].alias){
+            		  colMap[cols[i].label]=cols[i].alias;//字段别名
+            		}else{
+            	      colMap[cols[i].label]=cols[i].label;//字段名
+            		}
+            	}
+            	
+            	//数据源
+            	window.store= new Ext.data.JsonStore({
+    	            fields: fields,
+    	            data: (  (reportObject.define.charttype=='pie' ?   formatData(reportObject.define.data,reportObject.define.x, reportObject.define.y) : reportObject.define.data)  )
+    	        });
+            	
+            	
+            	
+            	//展现报表
+                renderReport(reportObject);
+        		
+        	});
         	
-        	reportObject =Ext.decode(localStorage.getItem("report_"+reportid));//报表内容
         	
         	
-        	var cols=reportObject.define.cols;
-        	
-        	for(var i=0,s=cols.length;i<s;i++){
-        		fields.push(cols[i].label);//字段
-        		if(cols[i].alias){
-        		  colMap[cols[i].label]=cols[i].alias;//字段别名
-        		}else{
-        	      colMap[cols[i].label]=cols[i].label;//字段名
-        		}
-        	}
-        	
-        	//数据源
-        	window.store= new Ext.data.JsonStore({
-	            fields: fields,
-	            data: (  (reportObject.define.charttype=='pie' ?   formatData(reportObject.define.data,reportObject.define.x, reportObject.define.y) : reportObject.define.data)  )
-	        });
-        	
-        	
-        	
-        	//展现报表
-            renderReport(reportObject);
         }
     });

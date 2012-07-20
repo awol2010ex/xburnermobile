@@ -268,10 +268,10 @@ function getClientReportList(callback){
 
 
 //删除客户端已保存报表
-function removeClientReportList(id,callback){
+function removeClientReportList(_id,callback){
 	  db.transaction(
 		function(tx){	
-		 tx.executeSql("delete from   T_BIZ_QUERY  where id= ?",[id],
+		 tx.executeSql("delete from   T_BIZ_QUERY  where id= ?",[_id],
 		  //成功
 		  callback,
 		  //失败
@@ -283,8 +283,26 @@ function removeClientReportList(id,callback){
 		 );
 		}
 	  );
-	}
+}
 
+//取得某一个已下载的报表
+function getClientReportById(_id ,callback){
+	 db.transaction(
+				function(tx){	
+				 tx.executeSql("select *  from   T_BIZ_QUERY  where id= ?",[_id],
+				  //成功
+				  callback,
+				  //失败
+			      function(err){
+			   	 
+			   	  
+			   	   Ext.Msg.alert('错误',"删除报表信息表失败:"+err.code, Ext.emptyFn);
+			      }
+				 );
+				}
+			  );
+	
+}
 
 
 

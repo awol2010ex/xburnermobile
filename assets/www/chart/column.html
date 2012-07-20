@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=320; user-scalable=no" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="../resources/css/touch-charts-demo.css" type="text/css">
+    <script type="text/javascript" charset="utf-8" src="../cordova-1.9.0.js"></script>
+    <script type="text/javascript" charset="utf-8" src="../js/sencha-touch.js"></script>
+    <script type="text/javascript" charset="utf-8" src="../js/touch-charts.js"></script>
+    <script type="text/javascript"  charset="utf-8" src="../js/db.js"></script>
+    <script type="text/javascript" charset="utf-8" src="../js/clientReport.js"></script>
+    <script type="text/javascript" >
+    var onHelpTap = function() {//帮助信息
+        new Ext.Panel({
+            floating: true,
+            modal: true,
+            centered: true,
+            width: 300,
+            height: 250,
+            styleHtmlContent: true,
+            scroll: 'vertical',
+            dockedItems: [{
+                dock: 'top',
+                xtype: 'toolbar',
+                title: '柱图'
+            }],
+            stopMaskTapEvent: false,
+            fullscreen: false,
+            html: "柱图实例,数据来自GIP"
+        }).show('pop');
+    };
+    //展现报表
+    function renderReport(_reportObject)
+    {
+    	
+    	var chartPanel =new Ext.chart.Panel({
+            fullscreen: true,
+            title: _reportObject.queryname,//图表标题
+            
+            dockedItems: [
+                  {//帮助
+                   xtype: 'button',
+                   iconCls: 'help',
+                   iconMask: true,
+                   ui: 'plain',
+                   handler: onHelpTap
+                  }          
+            ],
+            items: [{
+                cls: 'column1',
+                store: store,
+                animate: {
+                    easing: 'bounceOut',//滑动
+                    duration: 750
+                },
+                shadow: false,
+                legend: {
+                    position: {
+                        portrait: 'right',
+                        landscape: 'top'
+                    },
+                    labelFont: '17px'
+                },
+                axes: [{
+                    type: 'Numeric',
+                    position: 'left',
+                    fields: reportObject.define.y.split(","),
+                    title: '指标', 
+                    grid: true, 
+                    minimum: 0
+                }, {//坐标轴
+                    type: 'Category',
+                    position: 'bottom',
+                    fields: [reportObject.define.x],
+                    title: colMap[reportObject.define.x]
+                }],
+                series: [  
+                     {
+                      type: 'column',
+                      highlight: true,
+                      axis: 'left',
+                      smooth: true,
+                      xField:[reportObject.define.x],//X轴
+                      yField: reportObject.define.y.split(","),
+                      label: {//显示数据
+                    	    display: 'outside',//在柱子外面显示
+                    	    'text-anchor': 'middle',
+                    	    isOutside:true,
+                    	    field: reportObject.define.y.split(","),
+                    	    orientation: 'horizontal',//水平显示
+                    	    color: '#333'//字体颜色
+                      },
+                    //图例标题
+                      title:getYLabel( reportObject.define.y.split(","))
+                      
+                     }   
+                  
+                  
+                ],
+                interactions: [{
+                    type: 'reset'
+                },
+                {
+                    type: 'togglestacked'
+                },
+                {
+                    type: 'panzoom',//放大缩小
+                    axes: {
+                        left: {}
+                    }
+                },
+                {
+                    type: 'itemcompare',
+                    offset: {
+                        x: -10
+                    },
+                    listeners: {
+                        'show': function(interaction) {//增长对比显示
+                            var val1 = interaction.item1.value,
+                                val2 = interaction.item2.value;
+
+                            var n=Math.round((val2[1] - val1[1]) / val1[1] * 100);
+                            var text="增长";
+                            if(n<0){
+                                text="减少";
+                            }
+                            
+                            chartPanel.descriptionPanel.setTitle(val1[0] + ' 到 ' + val2[0] + ' '+text+' ' + n + '%');
+                            chartPanel.headerPanel.setActiveItem(1, {
+                                type: 'slide',
+                                direction: 'left'
+                            });
+                        },
+                        'hide': function() {//隐藏
+                            chartPanel.headerPanel.setActiveItem(0, {
+                                type: 'slide',
+                                direction: 'right'
+                            });
+                        }
+                    }
+                }]
+            }]
+	    });
+    }
+    
+    </script>
+</head>
+
+</head>
+<body></body>
+</html>
+    

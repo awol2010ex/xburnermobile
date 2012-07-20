@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=320; user-scalable=no" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <link rel="stylesheet" href="../resources/css/touch-charts-demo.css" type="text/css">
+    <script type="text/javascript" charset="utf-8" src="../cordova-1.9.0.js"></script>
+    <script type="text/javascript" charset="utf-8" src="../js/sencha-touch.js"></script>
+    <script type="text/javascript" charset="utf-8" src="../js/touch-charts.js"></script>
+    <script type="text/javascript"  charset="utf-8" src="../js/db.js"></script>
+    <script type="text/javascript" charset="utf-8" src="../js/clientReport.js"></script>
+    <script type="text/javascript" >
+    var onHelpTap = function() {//帮助信息
+        new Ext.Panel({
+            floating: true,
+            modal: true,
+            centered: true,
+            width: 300,
+            height: 250,
+            styleHtmlContent: true,
+            scroll: 'vertical',
+            dockedItems: [{
+                dock: 'top',
+                xtype: 'toolbar',
+                title: '饼图'
+            }],
+            stopMaskTapEvent: false,
+            fullscreen: false,
+            html: "饼图实例,数据来自GIP"
+        }).show('pop');
+    };
+    //展现报表
+    function renderReport(_reportObject)
+    {
+    	
+    	 var chartPanel =new Ext.chart.Panel({
+	            fullscreen: true,
+	            title: _reportObject.queryname,//图表标题
+	            
+	            dockedItems: [
+                      {//帮助
+                       xtype: 'button',
+                       iconCls: 'help',
+                       iconMask: true,
+                       ui: 'plain',
+                       handler: onHelpTap
+                      }          
+	            ],
+	            items: [{
+	                cls: 'pie1',
+	                theme: 'Demo',
+	                store: window.store,
+	                shadow: false,
+	                animate: true,
+	                insetPadding: 20,
+	                legend: {
+	                    position: {
+	                        portrait: 'bottom',
+	                        landscape: 'left'
+	                    }
+	                },
+	                interactions: [{
+	                    type: 'reset',
+	                    confirm: true
+	                },
+	                {
+	                    type: 'rotate'
+	                },
+	                {
+	                    type: 'piegrouping',
+	                    //snapWhileDragging: true,
+	                    onSelectionChange: function(me, items) {
+	                    	
+	                    	
+	                    	var showTotal=0;//已显示标签的总数
+	                    	var lg=me.getSeries().labelsGroup.items;//标签组
+	                    	for(var i=0,s=lg.length;i<s;i++){//计算总数(显示的)
+	                    		
+	                    		if(!lg[i].attr.hidden){
+
+		                            debugger;
+	                    			showTotal+=storeDataMap[lg[i].attr.text];
+	                    		}
+	                    	}
+	                    	
+	                    	
+	                        if (items && items.length) {
+	                            var sum = 0,
+	                                i = items.length;
+	                            while(i--) {
+	                                sum += items[i].storeItem.get(reportObject.define.y);
+	                            }
+	                            var title=colMap[reportObject.define.y]+': ' + sum+"("+(sum*100/showTotal).toFixed(2)+"%)";
+	                            chartPanel.descriptionPanel.setTitle(title);//显示百分比
+	                            chartPanel.headerPanel.setActiveItem(1, {
+	                                type: 'slide',
+	                                direction: 'left'
+	                            });
+	                        }
+	                        else {
+	                            chartPanel.headerPanel.setActiveItem(1, {
+	                                type: 'slide',
+	                                direction: 'left'
+	                            });
+	                            chartPanel.descriptionPanel.setTitle(colMap[reportObject.define.y]+"总数:"+showTotal+"(100%)");//显示总数
+	                        }
+	                    }
+	                }],
+	                series: [{
+	                    type: 'pie',
+	                    field: reportObject.define.y,
+	                    showInLegend: true,
+	                    highlight: false,
+	                    listeners: {
+	                        'labelOverflow': function(label, item) {
+	                            item.useCallout = true;
+	                        }
+	                    },
+	                    // Example to return as soon as styling arrives for callouts
+	                    callouts: {
+	                        renderer: function(callout, storeItem) {
+	                            callout.label.setAttributes({
+	                                text: storeItem.get(reportObject.define.x)
+	                            }, true);
+	                        },
+	                        filter: function() {
+	                            return false;
+	                        },
+	                        box: {
+	                          //no config here.
+	                        },
+	                        lines: {
+	                            'stroke-width': 2,
+	                            offsetFromViz: 20
+	                        },
+	                        label: {
+	                           font: 'italic 14px Arial'
+	                        },
+	                        styles: {
+	                            font: '14px Arial'
+	                        }
+	                    },
+	                    label: {
+	                        field:reportObject.define.x
+	                    }
+	                }]
+	             }]   
+    	 });
+    }
+    
+    </script>
+</head>
+
+</head>
+<body></body>
+</html>
+    

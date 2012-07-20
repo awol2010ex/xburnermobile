@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=320; user-scalable=no" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="../resources/css/touch-charts-demo.css" type="text/css">
+    <script type="text/javascript" charset="utf-8" src="../cordova-1.9.0.js"></script>
+    <script type="text/javascript" charset="utf-8" src="../js/sencha-touch.js"></script>
+    <script type="text/javascript" charset="utf-8" src="../js/touch-charts.js"></script>
+    <script type="text/javascript"  charset="utf-8" src="../js/db.js"></script>
+    <script type="text/javascript" charset="utf-8" src="../js/clientReport.js"></script>
+    <script type="text/javascript" >
+    var onHelpTap = function() {//帮助信息
+        new Ext.Panel({
+            floating: true,
+            modal: true,
+            centered: true,
+            width: 300,
+            height: 250,
+            styleHtmlContent: true,
+            scroll: 'vertical',
+            dockedItems: [{
+                dock: 'top',
+                xtype: 'toolbar',
+                title: '线图'
+            }],
+            stopMaskTapEvent: false,
+            fullscreen: false,
+            html: "线图实例,数据来自GIP"
+        }).show('pop');
+    };
+    //展现报表
+    function renderReport(_reportObject)
+    {
+    	var series=[];//列模型
+    	
+    	
+    	for(var j=0,l=_reportObject.define.y.split(",").length;j<l;j++){
+    		
+    		var ys=_reportObject.define.y.split(",")[j];
+    		
+    		
+    		series.push({
+                type: 'line',
+                showMarkers: false,
+                highlight: {
+                    size: 7,
+                    radius: 7
+                },
+                axis: 'left',
+                smooth: true,
+                xField: _reportObject.define.x,
+                yField: ys,
+                title:colMap[ys]
+            });
+    	}
+    	
+    	
+    	
+    	
+    	var chartPanel =new Ext.chart.Panel({
+            fullscreen: true,
+            title: _reportObject.queryname,//图表标题
+            
+            dockedItems: [
+                  {//帮助
+                   xtype: 'button',
+                   iconCls: 'help',
+                   iconMask: true,
+                   ui: 'plain',
+                   handler: onHelpTap
+                  }          
+            ],
+            items: [{
+                cls: 'line1',
+                theme: 'Demo',
+                store: store,
+                animate: true,
+                shadow: true,
+                legend: {
+                    position: 'right'
+                },
+                interactions: [
+                   {
+                      type: 'panzoom',
+                      axes: {//各个方向的放大倍数
+                    	  left: {
+                              maxZoom: 2
+                          },
+                          bottom: {
+                              maxZoom: 4
+                          },
+                          right: {
+                              minZoom: 0.5,
+                              maxZoom: 4,
+                              allowPan: false
+                          }
+                      }
+                   }, 
+                   {
+                      type: 'iteminfo',
+                      panel:{
+                    	  
+                    	  dockedItems: [{
+                              dock: 'top',
+                              xtype: 'toolbar',
+                              title: '明细数据'
+                          }]
+                      },
+                      listeners: {
+                         show: function(interaction, item, panel) {
+                           var yField=interaction.item.series.yField;
+                           var storeItem = item.storeItem;
+                           
+                           
+                           panel.update(['<ul><li><b>'+colMap[_reportObject.define.x]+': </b>' + storeItem.get(_reportObject.define.x) + '</li>', '<li><b>'+colMap[yField]+': </b> ' + item.value[1]+ '</li></ul>'].join(''));
+                           
+                           
+                         }
+                   }
+               }],
+                axes: [{
+                    type: 'Numeric',
+                    position: 'left',
+                    fields: _reportObject.define.y.split(","),
+                    title: '指标',
+                    minorTickSteps: 1
+                }, {
+                    type: 'Category',
+                    position: 'bottom',
+                    fields: [_reportObject.define.x],
+                    title: colMap[_reportObject.define.x]
+                }],
+                series: series
+            }]
+	    });
+    	
+    }
+    
+    </script>
+</head>
+
+</head>
+<body></body>
+</html>
+    
