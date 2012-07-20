@@ -146,7 +146,27 @@
                {
                    
                    title:"已下载",
-                   iconCls: 'download'
+                   iconCls: 'download',
+                   items:[
+                          
+                          {
+                         
+                            //give it an xtype of list
+                            xtype: 'list',
+
+                            ui: 'round',
+                            height:"100%",
+
+                            //itemTpl defines the template for each item in the list
+                            itemTpl: itemTplClient,
+
+                            //give it a link to the store instance
+                            store: clientStore,
+                            emptyText: '<div style="margin-top: 20px; text-align: center">没有报表</div>',
+                            disableSelection: true
+                         
+                         }
+                     ]
                },
                {
                    title:"设置",
@@ -238,6 +258,7 @@
 	        	        	Ext.Msg.alert('提示', '下载成功', Ext.emptyFn);
 	        	        	//有数据时保存报表信息
 	        	            saveQuery(_id , result.queryname , Ext.encode(result.define),  result.foldername);
+	        	        	
 	        	            
 	        	        }
 	        	        else{
@@ -256,6 +277,41 @@
 	        	      document.getElementById("loadingimg_"+_id).innerHTML="";
 	        	    }
 	       }); 
+    	
+    }
+    
+    
+  //刷新客户端报表
+    function refreshClientReport(){
+    	getClientReportList(function(tx,results){
+    		
+    		var data=[];
+    		
+    		if(results.rows.length>0){
+    			
+    		   for(var i=0,s=results.rows.length;i<s;i++){
+    			   var item=results.rows.item(i);
+    			   data.push({
+    				   id: item.id,//ID
+    				   queryname :item.queryname ,//报表名
+    				   foldername: item.foldername ,//目录名
+    				   define : Ext.decode(item.define)//报表定义
+    				   
+    			   });
+    		   }	
+    		}
+            //加载数据库
+            clientStore.loadData(data);
+    		
+    	});
+            
+            
+         
+    }
+  
+    //删除报表
+    function removeChart(_id){
+    	removeClientReportList(_id ,refreshClientReport);
     	
     }
     </script>

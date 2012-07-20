@@ -53,6 +53,8 @@ function initdb(){
 	    			  
 	    			//刷新服务端列表
 	    			  refreshServerList();
+	    			//刷新客户端报表
+	    			  refreshClientReport();
 	    		  }
 	    		  
 	    	  })
@@ -194,6 +196,10 @@ function saveQuery(_id , _queryname , _define ,_foldername){
 				   		    	     //alert("插入报表信息表成功");
 				   		    	     
 				   		    	     Ext.Msg.alert('提示',"插入报表信息表成功", Ext.emptyFn);
+				   		    	     
+
+				        	            //刷新客户端报表
+				  	    			    refreshClientReport();
 				   		         }
 				    		     
 				    		  
@@ -241,6 +247,43 @@ function saveQuery(_id , _queryname , _define ,_foldername){
 		 console.log(e); 
 	  }
 }
+
+//取得客户端已保存报表
+function getClientReportList(callback){
+  db.transaction(
+	function(tx){	
+	 tx.executeSql("select * from  T_BIZ_QUERY",[],
+	  //成功
+			 callback,
+	  //失败
+      function(err){
+   	 
+   	  
+   	   Ext.Msg.alert('错误',"查询报表信息表失败:"+err.code, Ext.emptyFn);
+      }
+	 );
+	}
+  );
+}
+
+
+//删除客户端已保存报表
+function removeClientReportList(id,callback){
+	  db.transaction(
+		function(tx){	
+		 tx.executeSql("delete from   T_BIZ_QUERY  where id= ?",[id],
+		  //成功
+		  callback,
+		  //失败
+	      function(err){
+	   	 
+	   	  
+	   	   Ext.Msg.alert('错误',"删除报表信息表失败:"+err.code, Ext.emptyFn);
+	      }
+		 );
+		}
+	  );
+	}
 
 
 
