@@ -9,7 +9,9 @@
     <link rel="stylesheet" href="resources/css/sencha-touch.css" type="text/css">
  
     <script type="text/javascript"  charset="utf-8" src="js/sencha-touch.js"></script>
+    <script type="text/javascript"  charset="utf-8" src="js/touch-charts.js"></script>
     <script type="text/javascript"  charset="utf-8" src="js/db.js"></script>
+    <script type="text/javascript"  charset="utf-8" src="js/clientReport.js"></script>
     <script type="text/javascript" >
     var server_page=1;//当前页
     
@@ -26,7 +28,7 @@
     //客户端列表展现模板                                 
     var itemTplClient= '<div class="contact"  style="padding:10px">'+
                                           '<img src="icon/delete.png" height="36" width="36"   onclick="removeChart(\'{id}\')"/>&nbsp;&nbsp;'+ //删除按钮
-                                           '<a  target="_blank" href="chart/{define.charttype}.html?reportid={id}" ><img src="icon/charticon/{define.charttype}/icon-ipad.png"  height="36" width="36"/></a>'+   //打开报表按钮
+                                           '<a   ><img src="icon/charticon/{define.charttype}/icon-ipad.png"  height="36" width="36"  onclick="openChart(\'{id}\')"/></a>'+   //打开报表按钮
                                           '&nbsp;&nbsp;<strong>{foldername}</strong> /<strong>{queryname}</strong>&nbsp;&nbsp;&nbsp;'+
                                           '<div id="loadingimg_{id}"></div>'+
                                           '</div>';
@@ -36,6 +38,8 @@
     
     //客户端数据源
     var clientStore=null;
+    
+    var tabs=null;//标签页
     
     //设置页面
     Ext.setup({
@@ -67,7 +71,7 @@
       server_total_page_field= new Ext.Panel({html:"<font color='white'>共1页</font>"});//显示服务端总页数
   	
   	
-  	  new Ext.TabPanel({
+      tabs =new Ext.TabPanel({
            tabBar: {
               dock: 'bottom',
               layout: {
