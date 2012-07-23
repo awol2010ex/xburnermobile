@@ -115,6 +115,7 @@
     function renderReport(_reportObject){
     	if(chartPanel){
     		tabs.remove(chartPanel);//删除原来展现的图表
+    		delete chartPanel;
     		chartPanel=null;
     	}
     	//柱图
