@@ -234,24 +234,30 @@
                                 }
                                 
                                 chartPanel.descriptionPanel.setTitle(val1[0] + ' 到 ' + val2[0] + ' '+text+' ' + n + '%');
+                                /*
                                 chartPanel.headerPanel.setActiveItem(1, {
                                     type: 'slide',
                                     direction: 'left'
                                 });
+                                
+                                */
+                                chartPanel.headerPanel.setActiveItem(1, false);//去掉动画效果
                             },
                             'hide': function() {//隐藏
+                            	/*
                                 chartPanel.headerPanel.setActiveItem(0, {
                                     type: 'slide',
                                     direction: 'right'
                                 });
+                                */
+                            	chartPanel.headerPanel.setActiveItem(0, false);//去掉动画效果
                             }
                         }
                     }]
                 }]
     	    });
     	    
-    	    tabs.add(chartPanel);//在tab上添加
-    	    tabs.setActiveItem(chartPanel);//设为当前tab
+    	    
     	}
     	else
     	//线图	
@@ -377,8 +383,6 @@
                     series: series
                 }]
     	    });
-        	tabs.add(chartPanel);//在tab上添加
-     	    tabs.setActiveItem(chartPanel);//设为当前tab
     	}
     	else
     	//饼图	
@@ -460,16 +464,22 @@
 	                            }
 	                            var title=colMap[_reportObject.define.y]+': ' + sum+"("+(sum*100/showTotal).toFixed(2)+"%)";
 	                            chartPanel.descriptionPanel.setTitle(title);//显示百分比
+	                            /*
 	                            chartPanel.headerPanel.setActiveItem(1, {
 	                                type: 'slide',
 	                                direction: 'left'
 	                            });
+	                            */
+	                            chartPanel.headerPanel.setActiveItem(1, false);//去掉动画效果
 	                        }
 	                        else {
+	                        	/*
 	                            chartPanel.headerPanel.setActiveItem(1, {
 	                                type: 'slide',
 	                                direction: 'left'
 	                            });
+	                            */
+	                            chartPanel.headerPanel.setActiveItem(1, false);//去掉动画效果
 	                            chartPanel.descriptionPanel.setTitle(colMap[reportObject.define.y]+"总数:"+showTotal+"(100%)");//显示总数
 	                        }
 	                    }
@@ -509,14 +519,16 @@
 	                        }
 	                    },
 	                    label: {
-	                        field:_reportObject.define.x
+	                        field:_reportObject.define.x//X轴标签
 	                    }
 	                }]
 	             }]   
     	 });
     	    
-    	    tabs.add(chartPanel);//在tab上添加
-     	    tabs.setActiveItem(chartPanel);//设为当前tab
+    	}
+    	if(chartPanel){
+    	   tabs.add(chartPanel);//在tab上添加
+	       tabs.setActiveItem(chartPanel,false);//设为当前tab
     	}
     	  
     }
