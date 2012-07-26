@@ -140,7 +140,7 @@
     	            stopMaskTapEvent: false,
     	            fullscreen: false,
     	            html: "柱图实例,数据来自GIP"
-    	        }).show('pop');
+    	        }).show(false);
     	    };
     	    chartPanel =new Ext.chart.Panel({
                 title: _reportObject.queryname,//图表标题
@@ -280,7 +280,7 @@
     	            stopMaskTapEvent: false,
     	            fullscreen: false,
     	            html: "线图实例,数据来自GIP"
-    	        }).show('pop');
+    	        }).show(false);
     	    };
     	    var series=[];//列模型
         	
@@ -348,6 +348,18 @@
                        }, 
                        {
                           type: 'iteminfo',
+                          onGesture: function(e) {//去掉弹出窗口的动画效果
+                              var me = this,
+                                  item = me.getItemForEvent(e),
+                                  panel;
+                              if (item) {
+                                  me.item = item;
+                                  item.series.highlightItem(item);
+                                  panel = me.getPanel();
+                                  me.fireEvent('show', me, item, panel);
+                                  panel.show(false);
+                              }
+                          },
                           panel:{
                         	  
                         	  dockedItems: [{
@@ -404,7 +416,7 @@
     	            stopMaskTapEvent: false,
     	            fullscreen: false,
     	            html: "饼图实例,数据来自GIP"
-    	        }).show('pop');
+    	        }).show(false);
     	    };
     	    chartPanel =new Ext.chart.Panel({
 	            title: _reportObject.queryname,//图表标题
