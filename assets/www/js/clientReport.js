@@ -142,6 +142,219 @@
     	            html: "柱图实例,数据来自GIP"
     	        }).show(false);
     	    };
+    	    //坐标轴
+    	    var axes=[{
+                type: 'Numeric',
+                position: 'left',
+                fields: _reportObject.define.y.split(","),
+                title: '指标', 
+                grid: true, 
+                minimum: 0
+            }, {//坐标轴
+                type: 'Category',
+                position: 'bottom',
+                fields: [_reportObject.define.x],
+                title: colMap[_reportObject.define.x]
+            }];
+    	    
+    	    //增加线图Y轴坐标轴
+    	    if(_reportObject.define.line_y){
+    	    	
+    	    	axes.push({
+    	    		type: 'Numeric',
+                    position: 'right',
+                    fields: _reportObject.define.line_y.split(","),
+                    title: '指标', 
+                    grid: true, 
+                    minimum: 0
+    	    		
+    	    	});
+    	    }
+    	    //
+    	    
+    	    //图形序列
+    	    var series=[  
+             {
+              type: 'column',
+              highlight: true,
+              axis: 'left',
+              smooth: true,
+              xField:[_reportObject.define.x],//X轴
+              yField: _reportObject.define.y.split(","),
+              label: {//显示数据
+            	    display: 'outside',//在柱子外面显示
+            	    'text-anchor': 'middle',
+            	    isOutside:true,
+            	    field: _reportObject.define.y.split(","),
+            	    orientation: 'horizontal',//水平显示
+            	    color: '#333'//字体颜色
+              },
+            //图例标题
+              title:getYLabel( _reportObject.define.y.split(",")),
+              /**
+               * Highlight the given series item.
+               * @param {Object} item Info about the item; same format as returned by #getItemForPoint.
+               */
+              highlightItem: function(item) {
+                  if (!item) {
+                      return;
+                  }
+
+                  var me = this,
+                      sprite = item.sprite,
+                      opts = me.highlightCfg,
+                      surface = me.chart.surface,
+                      animate = me.chart.animate,
+                      p, from, to, pi;
+                  animate=true;
+                  if (me.highlight === false || !sprite || sprite._highlighted) {
+                      return;
+                  }
+                  //make sure we apply the stylesheet styles.
+                  Ext.applyIf(me.highlightCfg, me.highlightStyle.style || {});
+                  
+                  if (sprite._anim) {
+                      sprite._anim.paused = true;
+                  }
+                  sprite._highlighted = true;
+                  if (!sprite._defaults) {
+                      sprite._defaults = Ext.apply({}, sprite.attr);
+                      from = {};
+                      to = {};
+                      for (p in opts) {
+                          if (! (p in sprite._defaults)) {
+                              sprite._defaults[p] = surface.attributeDefaults[surface.attributeMap[p]];
+                          }
+                          from[p] = sprite._defaults[p];
+                          to[p] = opts[p];
+                          if (Ext.isObject(opts[p])) {
+                              from[p] = {};
+                              to[p] = {};
+                              Ext.apply(sprite._defaults[p], sprite.attr[p]);
+                              Ext.apply(from[p], sprite._defaults[p]);
+                              for (pi in sprite._defaults[p]) {
+                                  if (! (pi in opts[p])) {
+                                      to[p][pi] = from[p][pi];
+                                  } else {
+                                      to[p][pi] = opts[p][pi];
+                                  }
+                              }
+                              for (pi in opts[p]) {
+                                  if (! (pi in to[p])) {
+                                      to[p][pi] = opts[p][pi];
+                                  }
+                              }
+                          }
+                      }
+                      sprite._from = from;
+                      sprite._to = to;
+                      sprite._endStyle = to;
+                  }
+                  
+                  if (animate) {
+                      sprite._anim = new Ext.fx.Anim({
+                          target: sprite,
+                          from: sprite._from,
+                          to: sprite._to,
+                          duration: me.highlightDuration || 150
+                      });
+                  } else {
+                      sprite.setAttributes(sprite._to, true);
+                  }
+
+                  me.fireEvent('highlight', item);
+              },
+
+              /**
+               * Un-highlight any existing highlights
+               */
+              unHighlightItem: function() {
+                  if (this.highlight === false || !this.items) {
+                      return;
+                  }
+
+                  var me = this,
+                      items = me.items,
+                      len = items.length,
+                      opts = me.highlightCfg,
+                      animate = me.chart.animate,
+                      i = 0,
+                      obj, p, sprite;
+                  animate=true;
+                  for (; i < len; i++) {
+                      if (!items[i]) {
+                          continue;
+                      }
+                      sprite = items[i].sprite;
+                      if (sprite && sprite._highlighted) {
+                          if (sprite._anim) {
+                              sprite._anim.paused = true;
+                          }
+                          obj = {};
+                          for (p in opts) {
+                              if (Ext.isObject(sprite._defaults[p])) {
+                                  obj[p] = {};
+                                  Ext.apply(obj[p], sprite._defaults[p]);
+                              }
+                              else {
+                                  obj[p] = sprite._defaults[p];
+                              }
+                          }
+                          if (animate) {
+                              //sprite._to = obj;
+                              sprite._endStyle = obj;
+                              sprite._anim = new Ext.fx.Anim({
+                                  target: sprite,
+                                  to: obj,
+                                  duration: me.highlightDuration || 150
+                              });
+                          }
+                          else {
+                              sprite.setAttributes(obj, true);
+                          }
+                          delete sprite._highlighted;
+                          //delete sprite._defaults;
+                      }
+                  }
+
+                  me.fireEvent('unhighlight');
+              }
+             }   
+          
+          
+            ];
+    	    
+    	    
+    	    //
+    	    
+    	    
+    	    
+    	    //增加线图序列
+    	    if(_reportObject.define.line_y){
+    	    	
+    	    	var line_ys=_reportObject.define.line_y.split(",");
+    	    	
+    	    	for(var i=0,s=line_ys.length;i<s;i++){
+    	    		
+    	    		series.push({
+    	    			
+    	    			
+    	    			type: 'line',
+                        showMarkers: true,
+                        highlight: {
+                           size: 7,
+                           radius: 7
+                        },
+                        axis: 'right',
+                        smooth: false,
+                        xField: _reportObject.define.x,
+                        yField: line_ys[i],
+                        title:colMap[line_ys[i]]
+    	    		});
+    	    	}
+    	    }
+    	    //
+    	    
     	    chartPanel =new Ext.chart.Panel({
                 title: _reportObject.queryname,//图表标题
                 iconCls: 'info',
@@ -172,169 +385,8 @@
                         },
                         labelFont: '17px'
                     },
-                    axes: [{
-                        type: 'Numeric',
-                        position: 'left',
-                        fields: reportObject.define.y.split(","),
-                        title: '指标', 
-                        grid: true, 
-                        minimum: 0
-                    }, {//坐标轴
-                        type: 'Category',
-                        position: 'bottom',
-                        fields: [_reportObject.define.x],
-                        title: colMap[_reportObject.define.x]
-                    }],
-                    series: [  
-                         {
-                          type: 'column',
-                          highlight: true,
-                          axis: 'left',
-                          smooth: true,
-                          xField:[_reportObject.define.x],//X轴
-                          yField: _reportObject.define.y.split(","),
-                          label: {//显示数据
-                        	    display: 'outside',//在柱子外面显示
-                        	    'text-anchor': 'middle',
-                        	    isOutside:true,
-                        	    field: _reportObject.define.y.split(","),
-                        	    orientation: 'horizontal',//水平显示
-                        	    color: '#333'//字体颜色
-                          },
-                        //图例标题
-                          title:getYLabel( _reportObject.define.y.split(",")),
-                          /**
-                           * Highlight the given series item.
-                           * @param {Object} item Info about the item; same format as returned by #getItemForPoint.
-                           */
-                          highlightItem: function(item) {
-                              if (!item) {
-                                  return;
-                              }
-
-                              var me = this,
-                                  sprite = item.sprite,
-                                  opts = me.highlightCfg,
-                                  surface = me.chart.surface,
-                                  animate = me.chart.animate,
-                                  p, from, to, pi;
-                              animate=true;
-                              if (me.highlight === false || !sprite || sprite._highlighted) {
-                                  return;
-                              }
-                              //make sure we apply the stylesheet styles.
-                              Ext.applyIf(me.highlightCfg, me.highlightStyle.style || {});
-                              
-                              if (sprite._anim) {
-                                  sprite._anim.paused = true;
-                              }
-                              sprite._highlighted = true;
-                              if (!sprite._defaults) {
-                                  sprite._defaults = Ext.apply({}, sprite.attr);
-                                  from = {};
-                                  to = {};
-                                  for (p in opts) {
-                                      if (! (p in sprite._defaults)) {
-                                          sprite._defaults[p] = surface.attributeDefaults[surface.attributeMap[p]];
-                                      }
-                                      from[p] = sprite._defaults[p];
-                                      to[p] = opts[p];
-                                      if (Ext.isObject(opts[p])) {
-                                          from[p] = {};
-                                          to[p] = {};
-                                          Ext.apply(sprite._defaults[p], sprite.attr[p]);
-                                          Ext.apply(from[p], sprite._defaults[p]);
-                                          for (pi in sprite._defaults[p]) {
-                                              if (! (pi in opts[p])) {
-                                                  to[p][pi] = from[p][pi];
-                                              } else {
-                                                  to[p][pi] = opts[p][pi];
-                                              }
-                                          }
-                                          for (pi in opts[p]) {
-                                              if (! (pi in to[p])) {
-                                                  to[p][pi] = opts[p][pi];
-                                              }
-                                          }
-                                      }
-                                  }
-                                  sprite._from = from;
-                                  sprite._to = to;
-                                  sprite._endStyle = to;
-                              }
-                              
-                              if (animate) {
-                                  sprite._anim = new Ext.fx.Anim({
-                                      target: sprite,
-                                      from: sprite._from,
-                                      to: sprite._to,
-                                      duration: me.highlightDuration || 150
-                                  });
-                              } else {
-                                  sprite.setAttributes(sprite._to, true);
-                              }
-
-                              me.fireEvent('highlight', item);
-                          },
-
-                          /**
-                           * Un-highlight any existing highlights
-                           */
-                          unHighlightItem: function() {
-                              if (this.highlight === false || !this.items) {
-                                  return;
-                              }
-
-                              var me = this,
-                                  items = me.items,
-                                  len = items.length,
-                                  opts = me.highlightCfg,
-                                  animate = me.chart.animate,
-                                  i = 0,
-                                  obj, p, sprite;
-                              animate=true;
-                              for (; i < len; i++) {
-                                  if (!items[i]) {
-                                      continue;
-                                  }
-                                  sprite = items[i].sprite;
-                                  if (sprite && sprite._highlighted) {
-                                      if (sprite._anim) {
-                                          sprite._anim.paused = true;
-                                      }
-                                      obj = {};
-                                      for (p in opts) {
-                                          if (Ext.isObject(sprite._defaults[p])) {
-                                              obj[p] = {};
-                                              Ext.apply(obj[p], sprite._defaults[p]);
-                                          }
-                                          else {
-                                              obj[p] = sprite._defaults[p];
-                                          }
-                                      }
-                                      if (animate) {
-                                          //sprite._to = obj;
-                                          sprite._endStyle = obj;
-                                          sprite._anim = new Ext.fx.Anim({
-                                              target: sprite,
-                                              to: obj,
-                                              duration: me.highlightDuration || 150
-                                          });
-                                      }
-                                      else {
-                                          sprite.setAttributes(obj, true);
-                                      }
-                                      delete sprite._highlighted;
-                                      //delete sprite._defaults;
-                                  }
-                              }
-
-                              me.fireEvent('unhighlight');
-                          }
-                         }   
-                      
-                      
-                    ],
+                    axes:axes ,//坐标
+                    series:series ,//序列
                     interactions: [{
                         type: 'reset'
                     },
