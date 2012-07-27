@@ -370,13 +370,11 @@
                 items: [{
                     cls: 'column1',
                     store: store,
-                    /*
+                   
                     animate: {
                         easing: 'bounceOut',//滑动
                         duration: 750
                     },
-                    */
-                    animate:false,
                     shadow: false,
                     legend: {
                         position: {
@@ -415,7 +413,7 @@
                                     text="减少";
                                 }
                                 
-                                chartPanel.descriptionPanel.setTitle(val1[0] + ' 到 ' + val2[0] + ' '+text+' ' + n + '%');
+                                chartPanel.descriptionPanel.setTitle(interaction.item1.storeItem.data[_reportObject.define.x] + ' 到 ' + interaction.item2.storeItem.data[_reportObject.define.x] + ' '+text+' ' + n + '%');
                                 /*
                                 chartPanel.headerPanel.setActiveItem(1, {
                                     type: 'slide',
