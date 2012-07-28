@@ -1,8 +1,10 @@
+
+
 //客户端报表通用方法
 
 
     
-  
+    var lineColorSet=["#FF292A","#57A45E","#A6CDEB"];//线图颜色集
     
   //根据报表ID取得当前报表定义
     function getDefineByReportid(reportid){
@@ -349,7 +351,16 @@
                         smooth: false,
                         xField: _reportObject.define.x,
                         yField: line_ys[i],
-                        title:colMap[line_ys[i]]
+                        title:colMap[line_ys[i]],
+                        i_value:i,
+                        getLegendColor:function(){//图例颜色
+                            return lineColorSet[this.i_value%3];
+                        },
+                        style:{  //线颜色
+                             stroke: lineColorSet[i%3], 
+                             'stroke-width': 2,  
+                             opacity: 1  
+                        }
     	    		});
     	    	}
     	    }
