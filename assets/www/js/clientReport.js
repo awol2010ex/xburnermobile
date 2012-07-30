@@ -483,16 +483,22 @@
         		
         		series.push({
                     type: 'line',
-                    showMarkers: false,
+                    showMarkers: true,
                     highlight: {
                         size: 7,
                         radius: 7
                     },
                     axis: 'left',
-                    smooth: true,
+                    smooth: false,
                     xField: _reportObject.define.x,
                     yField: ys,
-                    title:colMap[ys]
+                    title:colMap[ys],
+                    markerCfg: {
+                        type: 'circle',
+                        size: 4,
+                        radius: 4,
+                        'stroke-width': 0
+                     }
                 });
         	}
         	
@@ -513,7 +519,6 @@
                 ],
                 items: [{
                     cls: 'line1',
-                    theme: 'Demo',
                     store: store,
                     animate: true,
                     shadow: true,
@@ -576,6 +581,7 @@
                         position: 'left',
                         fields: _reportObject.define.y.split(","),
                         title: '指标',
+                        grid: true, 
                         minorTickSteps: 1
                     }, {
                         type: 'Category',
