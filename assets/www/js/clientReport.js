@@ -518,7 +518,7 @@
                     animate: true,
                     shadow: true,
                     legend: {
-                        position: 'right'
+                        position: 'top'
                     },
                     interactions: [
                        {
