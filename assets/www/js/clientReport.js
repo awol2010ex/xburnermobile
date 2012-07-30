@@ -360,7 +360,16 @@
                              stroke: lineColorSet[i%3], 
                              'stroke-width': 2,  
                              opacity: 1  
-                        }
+                        },
+                        markerStyle: new  Ext.chart.theme.MarkerStyle(//线图节点标记
+                        {
+                             type: 'circle',
+                             size: 4,
+                             radius: 4,
+                             'stroke-width': 0,
+                             'fill': lineColorSet[i%3],
+                                  
+                        })
     	    		});
     	    	}
     	    }
