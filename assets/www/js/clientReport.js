@@ -2,7 +2,7 @@
 
 //客户端报表通用方法
 
-
+    var help=null ;// 帮助信息
     
     var lineColorSet=["#FF292A","#57A45E","#A6CDEB"];//线图颜色集
     
@@ -115,11 +115,19 @@
     var chartPanel=null;//图表窗口
     //展现报表
     function renderReport(_reportObject){
+    	
+    	
     	if(chartPanel){
     		tabs.remove(chartPanel);//删除原来展现的图表
     		delete chartPanel;
     		chartPanel=null;
+    		
+    		
+    		
     	}
+    	
+    	help=_reportObject.define.help;//帮助信息
+    	
     	//柱图
     	if(_reportObject.define.charttype=='column'){
     		
@@ -141,7 +149,7 @@
     	            }],
     	            stopMaskTapEvent: false,
     	            fullscreen: false,
-    	            html: "柱图实例,数据来自GIP"
+    	            html: (help?help:"柱图实例,数据来自GIP")
     	        }).show(false);
     	    };
     	    //坐标轴
@@ -479,7 +487,7 @@
     	            }],
     	            stopMaskTapEvent: false,
     	            fullscreen: false,
-    	            html: "线图实例,数据来自GIP"
+    	            html: (help?help:"线图实例,数据来自GIP")
     	        }).show(false);
     	    };
     	    var series=[];//列模型
@@ -621,7 +629,7 @@
     	            }],
     	            stopMaskTapEvent: false,
     	            fullscreen: false,
-    	            html: "饼图实例,数据来自GIP"
+    	            html: (help?help:"饼图实例,数据来自GIP")
     	        }).show(false);
     	    };
     	    chartPanel =new Ext.chart.Panel({
