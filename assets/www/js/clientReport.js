@@ -157,7 +157,7 @@
                 type: 'Numeric',
                 position: 'left',
                 fields: _reportObject.define.y.split(","),
-                title: '指标', 
+                //title: '指标', 
                 grid: true, 
                 minimum: 0
             }, {//坐标轴
@@ -174,7 +174,7 @@
     	    		type: 'Numeric',
                     position: 'right',
                     fields: _reportObject.define.line_y.split(","),
-                    title: '指标', 
+                   // title: '指标', 
                     grid: true, 
                     minimum: 0
     	    		
@@ -597,7 +597,7 @@
                         type: 'Numeric',
                         position: 'left',
                         fields: _reportObject.define.y.split(","),
-                        title: '指标',
+                        //title: '指标',
                         grid: true, 
                         minorTickSteps: 1
                     }, {
